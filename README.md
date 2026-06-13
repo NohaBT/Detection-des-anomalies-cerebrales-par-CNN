@@ -8,8 +8,6 @@ L'application utilise un modèle **MobileNetV2** pour classifier les images IRM 
 *   **Tumeur hypophysaire** (Pituitary tumor)
 *   **Sain / Aucune tumeur** (No tumor)
 
----
-
 ## 🚀 Fonctionnalités principales
 
 L'application propose trois espaces adaptés à différents profils d'utilisateurs :
@@ -29,16 +27,12 @@ L'application propose trois espaces adaptés à différents profils d'utilisateu
 *   **Dossier Médical :** Consultation des informations personnelles (groupe sanguin, ville, âge, etc.) et du médecin référent.
 *   **Résultats d'Analyses :** Consultation sécurisée des résultats d'analyses d'IRM transmis par son médecin.
 
----
-
 ## 🛠️ Stack Technique
 
 *   **Langage :** Python 3.x
 *   **Interface Graphique (GUI) :** PySide6 (Qt pour Python) avec un design sombre moderne (Glassmorphism & animations de réseau de neurones).
 *   **Base de Données :** SQLite (mode WAL activé pour des accès concurrents sécurisés).
 *   **Deep Learning :** TensorFlow / Keras (Modèle MobileNetV2 pour la classification d'images).
-
----
 
 ## 📁 Structure du Projet
 
@@ -56,8 +50,6 @@ L'application propose trois espaces adaptés à différents profils d'utilisateu
 ├── .gitignore             # Fichiers exclus du contrôle de version
 └── README.md              # Présentation du projet
 ```
-
----
 
 ## 💻 Installation et Lancement
 
