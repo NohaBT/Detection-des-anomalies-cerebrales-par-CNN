@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroDetect — Inscription Médecin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #04080f;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border-focus: rgba(0,212,255,0.5);
+    --accent: #00d4ff;
+    --accent2: #0066ff;
+    --text: #f0f4ff;
+    --muted: rgba(240,244,255,0.45);
+    --danger: #ff4d6d;
+    --radius: 14px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 50%, rgba(0,102,255,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 70% at 80% 20%, rgba(0,212,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 60% 80%, rgba(0,30,80,0.5) 0%, transparent 70%),
+      #04080f;
+  }
+
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+
+  /* ── CANVAS (neural animation) ── */
+  canvas {
+    position: fixed; inset: 0; z-index: 0;
+    opacity: 0.3;
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    position: relative; z-index: 1;
+    display: flex;
+    height: 100vh;
+    align-items: center;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left {
+    flex: 1;
+    padding: 0 5vw 0 8vw;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .brand-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 24px rgba(0,212,255,0.4);
+  }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text);
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.4rem, 4vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-title span {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 400px;
+    font-weight: 300;
+  }
+
+  .features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .feat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: rgba(240,244,255,0.75);
+  }
+
+  .feat-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    flex-shrink: 0;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .badge {
+    padding: 5px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--surface);
+  }
+
+  /* ── RIGHT PANEL (CARD) ── */
+  .right {
+    width: min(480px, 42vw);
+    margin-right: 6vw;
+    flex-shrink: 0;
+  }
+
+  .card {
+    background: rgba(8,16,32,0.85);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem 2.25rem;
+    backdrop-filter: blur(24px);
+    box-shadow:
+      0 0 0 1px rgba(0,212,255,0.06) inset,
+      0 32px 80px rgba(0,0,0,0.5),
+      0 0 60px rgba(0,102,255,0.06);
+    animation: fadeUp 0.6s cubic-bezier(.16,1,.3,1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 14px;
+    border-radius: 100px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .card-sub {
+    font-size: 0.83rem;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* ── FORM ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .field.full { grid-column: 1 / -1; }
+
+  .field label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 500;
+    padding-left: 2px;
+  }
+
+  .field input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.875rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .field input::placeholder {
+    color: rgba(240,244,255,0.22);
+  }
+
+  .field input:focus {
+    border-color: var(--border-focus);
+    background: var(--surface-hover);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+  }
+
+  .field input:hover:not(:focus) {
+    border-color: rgba(255,255,255,0.14);
+    background: var(--surface-hover);
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 1.25rem 0;
+  }
+
+  /* ── BUTTON ── */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    box-shadow: 0 4px 24px rgba(0,212,255,0.25);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(0,212,255,0.35); }
+  .btn-primary:hover::after { opacity: 1; }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.83rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    margin-top: 0.6rem;
+  }
+
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: var(--surface); }
+
+  .footer-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .footer-link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .footer-link a:hover { text-decoration: underline; }
+
+  /* ── SCROLLABLE FORM ── */
+  .form-scroll {
+    max-height: calc(100vh - 260px);
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="grid-overlay"></div>
+<canvas id="c"></canvas>
+
+<div class="page">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="brand">
+      <div class="brand-icon">🧠</div>
+      <span class="brand-name">NeuroDetect</span>
+    </div>
+
+    <div>
+      <h1 class="hero-title">
+        Détection<br>tumorale <span>par IA</span><br>de précision.
+      </h1>
+    </div>
+
+    <p class="hero-sub">
+      Plateforme médicale de nouvelle génération pour l'analyse IRM assistée par intelligence artificielle — réservée aux professionnels de santé.
+    </p>
+
+    <div class="features">
+      <div class="feat"><div class="feat-dot"></div>Analyse IRM en temps réel</div>
+      <div class="feat"><div class="feat-dot"></div>Segmentation automatique des lésions</div>
+      <div class="feat"><div class="feat-dot"></div>Assistance diagnostique intelligente</div>
+      <div class="feat"><div class="feat-dot"></div>Données chiffrées et conformes RGPD</div>
+    </div>
+
+    <div class="badge-row">
+      <span class="badge">CE Médical</span>
+      <span class="badge">ISO 27001</span>
+      <span class="badge">HL7 FHIR</span>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-tag">
+          <span>⚕</span> Espace Médecin
+        </div>
+        <h2 class="card-title">Créer un compte</h2>
+        <p class="card-sub">Rejoignez le réseau NeuroDetect</p>
+      </div>
+
+      <div class="form-scroll">
+        <div class="form-grid">
+          <div class="field full">
+            <label>Nom complet</label>
+            <input type="text" placeholder="Dr. Karim Benali">
+          </div>
+          <div class="field">
+            <label>Identifiant</label>
+            <input type="text" placeholder="k.benali">
+          </div>
+          <div class="field">
+            <label>Adresse e-mail</label>
+            <input type="email" placeholder="dr@hopital.ma">
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <input type="password" placeholder="••••••••">
+          </div>
+          <div class="field">
+            <label>Confirmation</label>
+            <input type="password" placeholder="••••••••">
+          </div>
+          <div class="field">
+            <label>Spécialité</label>
+            <input type="text" placeholder="Neurologie">
+          </div>
+          <div class="field full">
+            <label>Hôpital / Clinique</label>
+            <input type="text" placeholder="CHU Ibn Rochd, Casablanca">
+          </div>
+          <div class="field">
+            <label>Années d'expérience</label>
+            <input type="number" placeholder="10" min="0">
+          </div>
+          <div class="field">
+            <label>Numéro INPE</label>
+            <input type="text" placeholder="00XXXXX">
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button class="btn-primary">Créer mon compte</button>
+        <button class="btn-secondary">← Retour à l'accueil</button>
+
+        <p class="footer-link">Déjà inscrit ? <a href="#">Se connecter</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Neural network canvas animation */
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, nodes = [], RAF;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initNodes(n = 55) {
+  nodes = [];
+  for (let i = 0; i < n; i++) {
+    nodes.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      r: Math.random() * 2 + 1,
+      pulse: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+function draw(t) {
+  ctx.clearRect(0, 0, W, H);
+  // Move
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    n.pulse += 0.018;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  });
+  // Edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 140) {
+        const alpha = (1 - dist / 140) * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(0,180,255,${alpha})`;
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+  }
+  // Nodes
+  nodes.forEach(n => {
+    const glow = 0.6 + 0.4 * Math.sin(n.pulse);
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r * glow, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,212,255,${0.5 * glow})`;
+    ctx.fill();
+  });
+  RAF = requestAnimationFrame(draw);
+}
+
+resize();
+initNodes();
+draw();
+window.addEventListener('resize', () => { resize(); initNodes(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Database files
+data/neurodetect.db
+data/neurodetect.db-shm
+data/neurodetect.db-wal
+
+# Large datasets (do not upload raw training/testing images to GitHub)
+data/Training/
+data/Testing/
+
+# Keras models (uncomment if you do not want to upload the 13MB models)
+# *.keras
+# *.pkl
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
