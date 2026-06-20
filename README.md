@@ -68,7 +68,5 @@ Exécutez la commande suivante depuis la racine du projet :
 python app/main.py
 ```
 
----
-
 ## 🔒 Sécurité et Données Privées
 Les mots de passe des utilisateurs sont chiffrés en base de données à l'aide de l'algorithme SHA-256 combiné à un sel (salt) généré aléatoirement pour chaque compte.
